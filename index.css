@@ -60,7 +60,6 @@ button:hover {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 60%;
-    /* Adjusted to 60% of parent width */
 }
 
 /* Updated Account info styling */
@@ -125,7 +124,6 @@ button:hover {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 40%;
-    /* Adjusted to 40% of parent width */
 }
 
 table {
@@ -195,19 +193,6 @@ footer {
         width: 100%;
         margin: 10px 0;
     }
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    #TopSection {
-        flex-direction: column;
-    }
-
-    #accountInfo,
-    #tradeInput {
-        width: 100%;
-        margin: 10px 0;
-    }
 
     /* Adjust form layout for better mobile viewing */
     #tradeForm label {
@@ -231,11 +216,21 @@ footer {
         /* Adjust based on your table content */
     }
 
-    /* Optional: Hide some less critical columns on mobile */
+    /* Show only the first, second, and last columns on mobile */
+    #tradeTable th:nth-child(1),
+    #tradeTable td:nth-child(1),
+    #tradeTable th:nth-child(2),
+    #tradeTable td:nth-child(2),
+    #tradeTable th:nth-child(4),
+    #tradeTable td:nth-child(4),
     #tradeTable th:nth-child(5),
     #tradeTable td:nth-child(5),
+    #tradeTable th:nth-child(6),
+    #tradeTable td:nth-child(6),
     #tradeTable th:nth-child(8),
-    #tradeTable td:nth-child(8) {
+    #tradeTable td:nth-child(8),
+    #tradeTable th:nth-child(9),
+    #tradeTable td:nth-child(9) {
         display: none;
     }
 }
@@ -261,5 +256,11 @@ footer {
 
     #tradeForm button {
         width: 100%;
+    }
+
+    /* Ensure proper table width on very small screens */
+    #tradeTable {
+        min-width: 300px;
+        /* Further adjust table content for very small screens */
     }
 }
