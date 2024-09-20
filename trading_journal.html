@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Journal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #accountInfo,
+        #tradeInput,
+        #tradeHistory {
+            margin-bottom: 20px;
+        }
+
+        #tradeForm label {
+            display: inline-block;
+            width: 120px;
+        }
+
+        #tradeForm input,
+        #tradeForm select {
+            width: 200px;
+            margin-bottom: 10px;
+        }
+
+        #initialOptions {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        #initialOptions button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Trading Journal</h1>
+
+    <div id="initialOptions">
+        <button id="newAccountBtn">Set Up New Account</button>
+        <button id="loadDataBtn">Load Existing Data</button>
+    </div>
+
+    <div id="mainContent" class="hidden">
+        <div id="accountInfo">
+            <h2>Account Information</h2>
+            <p>Starting Balance: <span id="displayStartingBalance"></span></p>
+            <p>Current Balance: <span id="displayCurrentBalance"></span></p>
+            <p>Trading Pair: <span id="displayTradingPair"></span></p>
+        </div>
+
+        <div id="tradeInput">
+            <h2>Record Trade</h2>
+            <form id="tradeForm">
+                <label for="entryDate">Entry Date:</label>
+                <input type="date" id="entryDate" required><br>
+                <label for="exitDate">Exit Date:</label>
+                <input type="date" id="exitDate" required><br>
+                <label for="tradeType">Type:</label>
+                <select id="tradeType" required>
+                    <option value="buy">Buy</option>
+                    <option value="sell">Sell</option>
+                </select><br>
+                <label for="entryPrice">Entry Price:</label>
+                <input type="number" id="entryPrice" step="0.00000001" required><br>
+                <label for="exitPrice">Exit Price:</label>
+                <input type="number" id="exitPrice" step="0.00000001" required><br>
+                <label for="positionSize">Position Size:</label>
+                <input type="number" id="positionSize" step="0.00000001" required><br>
+                <label for="profitLoss">Profit/Loss:</label>
+                <input type="number" id="profitLoss" step="0.01" required><br>
+                <label for="strategy">Strategy:</label>
+                <input type="text" id="strategy" required><br>
+                <label for="commission">Commission:</label>
+                <input type="number" id="commission" step="0.01" required><br>
+                <button type="submit">Record Trade</button>
+            </form>
+        </div>
+
+        <div id="tradeHistory">
+            <h2>Trade History</h2>
+            <table id="tradeTable">
+                <thead>
+                    <tr>
+                        <th>Entry Date</th>
+                        <th>Exit Date</th>
+                        <th>Type</th>
+                        <th>Entry Price</th>
+                        <th>Exit Price</th>
+                        <th>Position Size</th>
+                        <th>Profit/Loss</th>
+                        <th>Strategy</th>
+                        <th>Commission</th>
+                        <th>Net Profit/Loss</th>
+                    </tr>
+                </thead>
+                <tbody id="tradeTableBody"></tbody>
+            </table>
+        </div>
+
+        <div>
+            <h2>Load/Save Data</h2>
+            <input type="file" id="loadFile" accept=".json">
+            <button id="saveButton">Save to JSON</button>
+        </div>
+    </div>
+
+    <script>
+        let account = null;
+        let trades = [];
+
+        document.getElementById("newAccountBtn").addEventListener("click", function () {
+            window.location.href = 'account_setup.html';
+        });
+
+        document.getElementById("loadDataBtn").addEventListener("click", function () {
+            document.getElementById("loadFile").click();
+        });
+
+        function showMainContent() {
+            document.getElementById("initialOptions").classList.add("hidden");
+            document.getElementById("mainContent").classList.remove("hidden");
+        }
+
+        // Load account data on page load
+        window.addEventListener('load', function () {
+            const accountData = localStorage.getItem('tradingAccount');
+            if (accountData) {
+                account = JSON.parse(accountData);
+                trades = JSON.parse(localStorage.getItem('tradingTrades') || '[]');
+                updateAccountDisplay();
+                updateTradeTable();
+                showMainContent();
+            }
+        });
+
+        // Update account display
+        function updateAccountDisplay() {
+            document.getElementById("displayStartingBalance").textContent = account.startingBalance.toFixed(2);
+            document.getElementById("displayCurrentBalance").textContent = account.currentBalance.toFixed(2);
+            document.getElementById("displayTradingPair").textContent = account.tradingPair;
+        }
+
+        // Record trade
+        document.getElementById("tradeForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const trade = {
+                entryDate: document.getElementById("entryDate").value,
+                exitDate: document.getElementById("exitDate").value,
+                type: document.getElementById("tradeType").value,
+                entryPrice: parseFloat(document.getElementById("entryPrice").value),
+                exitPrice: parseFloat(document.getElementById("exitPrice").value),
+                positionSize: parseFloat(document.getElementById("positionSize").value),
+                profitLoss: parseFloat(document.getElementById("profitLoss").value),
+                strategy: document.getElementById("strategy").value,
+                commission: parseFloat(document.getElementById("commission").value)
+            };
+
+            // Calculate net profit/loss
+            trade.netProfitLoss = trade.profitLoss - trade.commission;
+
+            trades.push(trade);
+            updateAccountBalance(trade);
+            updateTradeTable();
+            this.reset();
+        });
+
+        // Update account balance
+        function updateAccountBalance(trade) {
+            account.currentBalance += trade.netProfitLoss;
+            updateAccountDisplay();
+            // Update localStorage
+            localStorage.setItem('tradingAccount', JSON.stringify(account));
+            localStorage.setItem('tradingTrades', JSON.stringify(trades));
+        }
+
+        // Update trade table
+        function updateTradeTable() {
+            const tbody = document.getElementById("tradeTableBody");
+            tbody.innerHTML = "";
+            trades.forEach(trade => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = trade.entryDate;
+                row.insertCell(1).textContent = trade.exitDate;
+                row.insertCell(2).textContent = trade.type;
+                row.insertCell(3).textContent = trade.entryPrice.toFixed(5);
+                row.insertCell(4).textContent = trade.exitPrice.toFixed(5);
+                row.insertCell(5).textContent = trade.positionSize.toFixed(2);
+                row.insertCell(6).textContent = trade.profitLoss.toFixed(2);
+                row.insertCell(7).textContent = trade.strategy;
+                row.insertCell(8).textContent = trade.commission.toFixed(2);
+                row.insertCell(9).textContent = trade.netProfitLoss.toFixed(2);
+            });
+        }
+
+        // Save data to JSON
+        document.getElementById("saveButton").addEventListener("click", function () {
+            const data = JSON.stringify({ account, trades });
+            const blob = new Blob([data], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "trading_journal_data.json";
+            a.click();
+        });
+
+        // Load data from JSON
+        document.getElementById("loadFile").addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const data = JSON.parse(e.target.result);
+                    account = data.account;
+                    trades = data.trades;
+                    updateAccountDisplay();
+                    updateTradeTable();
+                    // Update localStorage
+                    localStorage.setItem('tradingAccount', JSON.stringify(account));
+                    localStorage.setItem('tradingTrades', JSON.stringify(trades));
+                    showMainContent();
+                };
+                reader.readAsText(file);
+            }
+        });
+    </script>
+</body>
+
+</html>
