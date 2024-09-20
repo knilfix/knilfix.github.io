@@ -36,23 +36,31 @@ button:hover {
     background-color: #218838;
 }
 
+/* New parent containers */
+#TopSection,
+#BottomSection {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
 #TopSection {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
 }
 
 /* Updated Container for account info and chart */
 #accountInfo {
     display: flex;
     flex-direction: column;
-    margin-top: 20px;
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 48%;
-    /* Adjust width to allow space for tradeInput */
+    width: 60%;
+    /* Adjusted to 60% of parent width */
 }
 
 /* Updated Account info styling */
@@ -110,14 +118,14 @@ button:hover {
 
 #tradeInput {
     flex: 1;
-    margin: 0 10px;
+    margin-left: 20px;
     padding: 20px;
     border: 1px solid #ddd;
     background-color: #f9f9f9;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 48%;
-    /* Adjust width to match accountInfo */
+    width: 40%;
+    /* Adjusted to 40% of parent width */
 }
 
 table {
@@ -186,5 +194,72 @@ footer {
     #tradeInput {
         width: 100%;
         margin: 10px 0;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    #TopSection {
+        flex-direction: column;
+    }
+
+    #accountInfo,
+    #tradeInput {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    /* Adjust form layout for better mobile viewing */
+    #tradeForm label {
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    #tradeForm input,
+    #tradeForm select {
+        width: 100%;
+    }
+
+    /* Make table scrollable horizontally */
+    #tradeHistory {
+        overflow-x: auto;
+    }
+
+    #tradeTable {
+        min-width: 600px;
+        /* Adjust based on your table content */
+    }
+
+    /* Optional: Hide some less critical columns on mobile */
+    #tradeTable th:nth-child(5),
+    #tradeTable td:nth-child(5),
+    #tradeTable th:nth-child(8),
+    #tradeTable td:nth-child(8) {
+        display: none;
+    }
+}
+
+/* Further optimization for very small screens */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    #initialOptions,
+    #mainContent {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    h2 {
+        font-size: 1.2em;
+    }
+
+    #tradeForm button {
+        width: 100%;
     }
 }
