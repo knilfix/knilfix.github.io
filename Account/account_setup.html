@@ -5,46 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trading Journal - Account Setup</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-        }
-
-        form {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-        }
-
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-top: 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <link rel="stylesheet" href="account_setup.css">
 </head>
 
 <body>
@@ -64,19 +25,8 @@
         <button type="submit">Create Account</button>
     </form>
 
-    <script>
-        document.getElementById("accountSetupForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-            const startingBalance = parseFloat(document.getElementById("startingBalance").value);
-            const tradingPair = document.getElementById("tradingPair").value;
-            const account = { startingBalance, currentBalance: startingBalance, tradingPair };
+    <script src="account_setup.js">
 
-            // Save account data to localStorage
-            localStorage.setItem('tradingAccount', JSON.stringify(account));
-
-            // Redirect to main trading journal page
-            window.location.href = 'index.html';
-        });
     </script>
 </body>
 

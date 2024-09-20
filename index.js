@@ -1,9 +1,13 @@
 let account = null;
 let trades = [];
-let cumulativeBalances = []; // Corrected variable name
+let cumulativeBalances = [];
+//location of Other scripts
+const accountHtml = './Account/account_setup.html'
+
+// Corrected variable name
 
 document.getElementById("newAccountBtn").addEventListener("click", function () {
-    window.location.href = './Account/account_setup.html';
+    window.location.href = accountHtml;
 });
 
 document.getElementById("loadDataBtn").addEventListener("click", function () {
