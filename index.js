@@ -220,3 +220,17 @@ document.getElementById("clearDataBtn").addEventListener("click", function () {
         location.reload(); // Refresh the page
     }
 });
+
+const openModalButton = document.getElementById("openModalBtn");
+const modal = document.getElementById("modal");
+const closeModalButton = document.querySelector(".close-button");
+
+// Open the modal when the button is clicked
+openModalButton.onclick = function () {
+    modal.classList.remove("hidden");
+}
+
+// Close the modal when the close button is clicked
+closeModalButton.onclick = function () {
+    modal.classList.add("hidden");
+}

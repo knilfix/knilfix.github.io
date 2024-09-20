@@ -11,12 +11,44 @@ h1 {
     color: #333;
 }
 
-#initialOptions,
-#mainContent {
-    max-width: 90%;
+/* Modal styles */
+.modal {
+    display: flex;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #c04b4b;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 90%;
+}
+
+.close-button {
+    float: right;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+}
+
+#mainContainer {
+    width: 100%;
+    /* Set to 100% width */
+    max-width: 100%;
+    /* Optional: Limit max width for larger screens */
     margin: 20px auto;
     padding: 20px;
-    background: #fff;
+    background: #161616;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -36,33 +68,34 @@ button:hover {
     background-color: #218838;
 }
 
-/* New parent containers */
 #TopSection,
 #BottomSection {
-    margin-bottom: 20px;
-    padding: 20px;
-    background-color: #fff;
+    width: 100%;
+
+    background-color: #a54242;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 #TopSection {
+    width: 100%;
     display: flex;
+    flex-wrap: wrap;
+    /* Ensure items wrap on smaller screens */
     justify-content: space-between;
+    background-color: #fcfcfc;
 }
 
-/* Updated Container for account info and chart */
 #accountInfo {
     display: flex;
     flex-direction: column;
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: hsl(240, 25%, 98%);
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 60%;
 }
 
-/* Updated Account info styling */
 #info {
     background-color: #fff;
     border: 1px solid rgba(0, 0, 0, 0.2);
@@ -72,7 +105,6 @@ button:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Account information text styling */
 #info h2,
 #charts h2 {
     font-size: 1.5rem;
@@ -91,7 +123,8 @@ button:hover {
     color: #008cba;
 }
 
-/* Updated Chart styling */
+
+
 #charts {
     background-color: #fff;
     border: 1px solid rgba(0, 0, 0, 0.2);
@@ -101,13 +134,11 @@ button:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Ensure chart canvas takes up more space */
 #balanceChart {
     width: 100%;
     height: 400px;
 }
 
-/* Optional hover effect for a polished look */
 #info:hover,
 #charts:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -124,6 +155,31 @@ button:hover {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 40%;
+}
+
+#btnspacer {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+
+}
+
+#btnspacerh2 {
+    margin: 0;
+}
+
+#btnspacerbutton {
+    padding: 8px 15px;
+    background-color: #84bb91;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#btnspacerbutton:hover {
+    background-color: #218838;
 }
 
 table {
@@ -143,6 +199,8 @@ th {
     background-color: #007bff;
     color: white;
 }
+
+
 
 #tradeHistory {
     margin-top: 20px;
@@ -191,10 +249,9 @@ footer {
     #accountInfo,
     #tradeInput {
         width: 100%;
-        margin: 10px 0;
+
     }
 
-    /* Adjust form layout for better mobile viewing */
     #tradeForm label {
         display: block;
         width: 100%;
@@ -206,17 +263,14 @@ footer {
         width: 100%;
     }
 
-    /* Make table scrollable horizontally */
     #tradeHistory {
         overflow-x: auto;
     }
 
     #tradeTable {
-        min-width: 600px;
-        /* Adjust based on your table content */
+        min-width: 780px;
     }
 
-    /* Show only the first, second, and last columns on mobile */
     #tradeTable th:nth-child(1),
     #tradeTable td:nth-child(1),
     #tradeTable th:nth-child(2),
@@ -258,9 +312,7 @@ footer {
         width: 100%;
     }
 
-    /* Ensure proper table width on very small screens */
     #tradeTable {
         min-width: 300px;
-        /* Further adjust table content for very small screens */
     }
 }
