@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing Trading Journal</title>
+    <link rel="stylesheet" href="testing.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+    <h1>Trading Journal Testing</h1>
+
+    <div id="accountInfo">
+        <div id="info">
+            <h2>Account Information</h2>
+            <p>Starting Balance: <span id="displayStartingBalance">1000</span></p>
+            <p>Current Balance: <span id="displayCurrentBalance"></span></p>
+            <p>Trading Pair: <span id="displayTradingPair">BTC/USD</span></p>
+        </div>
+        <div id="charts">
+            <h2>Trading Charts</h2>
+            <!-- Charts will be displayed here -->
+            <canvas id="balanceChart" width="300" height="200"></canvas>
+
+        </div>
+    </div>
+
+    <script src="testing.js"></script>
+</body>
+
+</html>

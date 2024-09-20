@@ -13,7 +13,8 @@ h1 {
 
 #initialOptions,
 #mainContent {
-    max-width: 800px;
+    max-width: 90%;
+    /* Increased width */
     margin: 20px auto;
     padding: 20px;
     background: #fff;
@@ -36,6 +37,24 @@ button:hover {
     background-color: #218838;
 }
 
+#TopSection {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+#accountInfo,
+#tradeInput {
+    flex: 1;
+    /* Allow both sections to take equal space */
+    margin: 0 10px;
+    /* Add some spacing between them */
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    /* Maintain card background color */
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -54,10 +73,8 @@ th {
     color: white;
 }
 
-#accountInfo,
-#tradeInput,
 #tradeHistory {
-    margin-bottom: 20px;
+    margin-top: 20px;
 }
 
 #tradeForm label {
