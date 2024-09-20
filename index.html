@@ -134,6 +134,10 @@
             <input type="file" id="loadFile" accept=".json">
             <button id="saveButton">Save to JSON</button>
         </div>
+        <div>
+            <button id="clearDataBtn">Clear All Data</button>
+
+        </div>
     </div>
 
     <script>
@@ -197,12 +201,17 @@
         });
 
         // Update account balance
-        function updateAccountBalance(trade) {
-            account.currentBalance += trade.netProfitLoss;
-            updateAccountDisplay();
-            // Update localStorage
-            localStorage.setItem('tradingAccount', JSON.stringify(account));
-            localStorage.setItem('tradingTrades', JSON.stringify(trades));
+        function updateAccountDisplay() {
+            if (account) {
+                document.getElementById("displayStartingBalance").textContent = account.startingBalance.toFixed(2);
+                document.getElementById("displayCurrentBalance").textContent = account.currentBalance.toFixed(2);
+                document.getElementById("displayTradingPair").textContent = account.tradingPair;
+            } else {
+                // If account is null, reset displayed values
+                document.getElementById("displayStartingBalance").textContent = "0.00";
+                document.getElementById("displayCurrentBalance").textContent = "0.00";
+                document.getElementById("displayTradingPair").textContent = "N/A";
+            }
         }
 
         // Update trade table
@@ -252,6 +261,23 @@
                     showMainContent();
                 };
                 reader.readAsText(file);
+            }
+        });
+
+        document.getElementById("clearDataBtn").addEventListener("click", function () {
+            const confirmClear = confirm("Are you sure you want to clear all data?");
+            if (confirmClear) {
+                localStorage.clear(); // Clear local storage
+                account = null; // Reset account variable
+                trades = []; // Reset trades array
+
+                // Update display and table
+                updateAccountDisplay(); // Update display to reflect cleared data
+                updateTradeTable(); // Clear trade table
+
+                // Alert and refresh
+                alert("All data has been cleared.");
+                location.reload(); // Refresh the page
             }
         });
     </script>
