@@ -17,6 +17,23 @@
             padding: 8px;
             text-align: left;
         }
+
+        form {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 10px;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            text-align: right;
+        }
+
+        input,
+        select {
+            width: 100%;
+        }
     </style>
 </head>
 
@@ -24,35 +41,59 @@
     <h1>Forex Trade Recorder</h1>
 
     <form id="tradeForm">
+        <label for="entryDate">Entry Date:</label>
+        <input type="datetime-local" id="entryDate" required>
+
+        <label for="exitDate">Exit Date:</label>
+        <input type="datetime-local" id="exitDate" required>
+
         <label for="pair">Currency Pair:</label>
-        <input type="text" id="pair" required><br>
+        <input type="text" id="pair" required placeholder="e.g., EUR/USD">
+
+        <label for="tradeType">Trade Type:</label>
+        <select id="tradeType" required>
+            <option value="buy">Buy</option>
+            <option value="sell">Sell</option>
+        </select>
+
+        <label for="positionSize">Position Size:</label>
+        <input type="number" id="positionSize" step="0.01" required>
 
         <label for="entryPrice">Entry Price:</label>
-        <input type="number" id="entryPrice" step="0.00001" required><br>
+        <input type="number" id="entryPrice" step="0.00001" required>
 
         <label for="exitPrice">Exit Price:</label>
-        <input type="number" id="exitPrice" step="0.00001" required><br>
+        <input type="number" id="exitPrice" step="0.00001" required>
 
         <label for="stopLoss">Stop Loss:</label>
-        <input type="number" id="stopLoss" step="0.00001" required><br>
+        <input type="number" id="stopLoss" step="0.00001" required>
 
-        <label for="outcome">Outcome:</label>
-        <select id="outcome" required>
-            <option value="win">Win</option>
-            <option value="loss">Loss</option>
-        </select><br>
+        <label for="strategy">Strategy:</label>
+        <input type="text" id="strategy" required>
 
-        <button type="submit">Record Trade</button>
+        <label for="profitLoss">Profit/Loss:</label>
+        <input type="number" id="profitLoss" step="0.01" required>
+
+        <label for="commission">Commission:</label>
+        <input type="number" id="commission" step="0.01" required>
+
+        <button type="submit" style="grid-column: span 2;">Record Trade</button>
     </form>
 
     <h2>Recorded Trades</h2>
     <table id="tradesTable">
         <tr>
+            <th>Entry Date</th>
+            <th>Exit Date</th>
             <th>Pair</th>
+            <th>Type</th>
+            <th>Position Size</th>
             <th>Entry</th>
             <th>Exit</th>
             <th>Stop Loss</th>
-            <th>Outcome</th>
+            <th>Strategy</th>
+            <th>Profit/Loss</th>
+            <th>Commission</th>
         </tr>
     </table>
 
@@ -65,11 +106,17 @@
         document.getElementById('tradeForm').onsubmit = function (e) {
             e.preventDefault();
             const trade = {
+                entryDate: document.getElementById('entryDate').value,
+                exitDate: document.getElementById('exitDate').value,
                 pair: document.getElementById('pair').value,
+                tradeType: document.getElementById('tradeType').value,
+                positionSize: parseFloat(document.getElementById('positionSize').value),
                 entryPrice: parseFloat(document.getElementById('entryPrice').value),
                 exitPrice: parseFloat(document.getElementById('exitPrice').value),
                 stopLoss: parseFloat(document.getElementById('stopLoss').value),
-                outcome: document.getElementById('outcome').value
+                strategy: document.getElementById('strategy').value,
+                profitLoss: parseFloat(document.getElementById('profitLoss').value),
+                commission: parseFloat(document.getElementById('commission').value)
             };
             trades.push(trade);
             updateTable();
@@ -83,11 +130,17 @@
             }
             trades.forEach(trade => {
                 const row = table.insertRow();
-                row.insertCell(0).textContent = trade.pair;
-                row.insertCell(1).textContent = trade.entryPrice;
-                row.insertCell(2).textContent = trade.exitPrice;
-                row.insertCell(3).textContent = trade.stopLoss;
-                row.insertCell(4).textContent = trade.outcome;
+                row.insertCell(0).textContent = new Date(trade.entryDate).toLocaleString();
+                row.insertCell(1).textContent = new Date(trade.exitDate).toLocaleString();
+                row.insertCell(2).textContent = trade.pair;
+                row.insertCell(3).textContent = trade.tradeType;
+                row.insertCell(4).textContent = trade.positionSize;
+                row.insertCell(5).textContent = trade.entryPrice;
+                row.insertCell(6).textContent = trade.exitPrice;
+                row.insertCell(7).textContent = trade.stopLoss;
+                row.insertCell(8).textContent = trade.strategy;
+                row.insertCell(9).textContent = trade.profitLoss;
+                row.insertCell(10).textContent = trade.commission;
             });
         }
 
