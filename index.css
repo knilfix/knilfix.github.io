@@ -14,7 +14,6 @@ h1 {
 #initialOptions,
 #mainContent {
     max-width: 90%;
-    /* Increased width */
     margin: 20px auto;
     padding: 20px;
     background: #fff;
@@ -43,16 +42,82 @@ button:hover {
     margin-bottom: 20px;
 }
 
-#accountInfo,
+/* Updated Container for account info and chart */
+#accountInfo {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 48%;
+    /* Adjust width to allow space for tradeInput */
+}
+
+/* Updated Account info styling */
+#info {
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Account information text styling */
+#info h2,
+#charts h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+#info p {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    color: #444;
+}
+
+#info p span {
+    font-weight: bold;
+    color: #008cba;
+}
+
+/* Updated Chart styling */
+#charts {
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    flex-grow: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure chart canvas takes up more space */
+#balanceChart {
+    width: 100%;
+    height: 400px;
+}
+
+/* Optional hover effect for a polished look */
+#info:hover,
+#charts:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    transition: all 0.3s ease-in-out;
+}
+
 #tradeInput {
     flex: 1;
-    /* Allow both sections to take equal space */
     margin: 0 10px;
-    /* Add some spacing between them */
     padding: 20px;
     border: 1px solid #ddd;
     background-color: #f9f9f9;
-    /* Maintain card background color */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 48%;
+    /* Adjust width to match accountInfo */
 }
 
 table {
@@ -75,6 +140,10 @@ th {
 
 #tradeHistory {
     margin-top: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
 }
 
 #tradeForm label {
@@ -105,4 +174,17 @@ footer {
     margin-top: 20px;
     font-size: 14px;
     color: #777;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    #TopSection {
+        flex-direction: column;
+    }
+
+    #accountInfo,
+    #tradeInput {
+        width: 100%;
+        margin: 10px 0;
+    }
 }
