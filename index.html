@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forex Trade Recorder</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Forex Trade Recorder</h1>
+
+    <form id="tradeForm">
+        <label for="pair">Currency Pair:</label>
+        <input type="text" id="pair" required><br>
+
+        <label for="entryPrice">Entry Price:</label>
+        <input type="number" id="entryPrice" step="0.00001" required><br>
+
+        <label for="exitPrice">Exit Price:</label>
+        <input type="number" id="exitPrice" step="0.00001" required><br>
+
+        <label for="stopLoss">Stop Loss:</label>
+        <input type="number" id="stopLoss" step="0.00001" required><br>
+
+        <label for="outcome">Outcome:</label>
+        <select id="outcome" required>
+            <option value="win">Win</option>
+            <option value="loss">Loss</option>
+        </select><br>
+
+        <button type="submit">Record Trade</button>
+    </form>
+
+    <h2>Recorded Trades</h2>
+    <table id="tradesTable">
+        <tr>
+            <th>Pair</th>
+            <th>Entry</th>
+            <th>Exit</th>
+            <th>Stop Loss</th>
+            <th>Outcome</th>
+        </tr>
+    </table>
+
+    <button onclick="saveTrades()">Save Trades</button>
+    <input type="file" id="loadFile" onchange="loadTrades()">
+
+    <script>
+        let trades = [];
+
+        document.getElementById('tradeForm').onsubmit = function (e) {
+            e.preventDefault();
+            const trade = {
+                pair: document.getElementById('pair').value,
+                entryPrice: parseFloat(document.getElementById('entryPrice').value),
+                exitPrice: parseFloat(document.getElementById('exitPrice').value),
+                stopLoss: parseFloat(document.getElementById('stopLoss').value),
+                outcome: document.getElementById('outcome').value
+            };
+            trades.push(trade);
+            updateTable();
+            this.reset();
+        };
+
+        function updateTable() {
+            const table = document.getElementById('tradesTable');
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+            trades.forEach(trade => {
+                const row = table.insertRow();
+                row.insertCell(0).textContent = trade.pair;
+                row.insertCell(1).textContent = trade.entryPrice;
+                row.insertCell(2).textContent = trade.exitPrice;
+                row.insertCell(3).textContent = trade.stopLoss;
+                row.insertCell(4).textContent = trade.outcome;
+            });
+        }
+
+        function saveTrades() {
+            const dataStr = JSON.stringify(trades);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            const exportFileDefaultName = 'forex-trades.json';
+
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function loadTrades() {
+            const file = document.getElementById('loadFile').files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                trades = JSON.parse(e.target.result);
+                updateTable();
+            };
+
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+
+</html>
