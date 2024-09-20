@@ -263,6 +263,10 @@ footer {
         width: 100%;
     }
 
+    #button {
+        padding: 2px;
+    }
+
     #tradeHistory {
         overflow-x: auto;
     }
