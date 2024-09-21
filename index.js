@@ -1,6 +1,10 @@
 let account = null;
 let trades = [];
 let cumulativeBalances = [];
+
+// Global variables
+let currentPage = 1;
+const rowsPerPage = 10
 //location of Other scripts
 const accountHtml = './Account/account_setup.html'
 
@@ -30,6 +34,7 @@ window.addEventListener('load', function () {
         updateTradeTable();
         updateChart(); // Initial chart update
         showMainContent();
+        displayTrades(); // Display
     }
 });
 
@@ -69,6 +74,58 @@ document.getElementById("tradeForm").addEventListener("submit", function (e) {
     updateTradeTable();
     this.reset(); // Reset the form
 });
+
+//to display
+function displayTrades() {
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const tableBody = document.getElementById('tradeTableBody');
+    tableBody.innerHTML = '';
+
+    for (let i = startIndex; i < endIndex && i < trades.length; i++) {
+        const trade = trades[i];
+        const row = `
+            <tr class="table-row-alternate">
+                <td class="table-cell">${trade.entryDate}</td>
+                <td class="table-cell">${trade.exitDate}</td>
+                <td class="table-cell">${trade.type}</td>
+                <td class="table-cell-right">${trade.entryPrice.toFixed(2)}</td>
+                <td class="table-cell-right">${trade.exitPrice.toFixed(2)}</td>
+                <td class="table-cell-right">${trade.positionSize.toFixed(2)}</td>
+                <td class="table-cell-right">${trade.profitLoss.toFixed(2)}</td>
+                <td class="table-cell">${trade.strategy}</td>
+                <td class="table-cell-right">${trade.commission.toFixed(2)}</td>
+                <td class="table-cell-right">${(trade.profitLoss - trade.commission).toFixed(2)}</td>
+            </tr>
+        `;
+        tableBody.innerHTML += row;
+    }
+
+    updatePaginationInfo();
+}
+
+function updatePaginationInfo() {
+    const totalPages = Math.ceil(trades.length / rowsPerPage);
+    document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+    document.getElementById('prevPage').disabled = currentPage === 1;
+    document.getElementById('nextPage').disabled = currentPage === totalPages;
+}
+
+document.getElementById('prevPage').addEventListener('click', () => {
+    if (currentPage > 1) {
+        currentPage--;
+        displayTrades();
+    }
+});
+
+document.getElementById('nextPage').addEventListener('click', () => {
+    const totalPages = Math.ceil(trades.length / rowsPerPage);
+    if (currentPage < totalPages) {
+        currentPage++;
+        displayTrades();
+    }
+});
+
 
 // Update account balance display
 function updateAccountDisplay() {
@@ -129,6 +186,7 @@ function updateChart() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 x: {
                     title: {
