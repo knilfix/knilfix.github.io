@@ -4,11 +4,20 @@ let cumulativeBalances = [];
 
 // Global variables
 let currentPage = 1;
-const rowsPerPage = 10
-//location of Other scripts
-const accountHtml = './Account/account_setup.html'
+const rowsPerPage = 10;
 
-// Corrected variable name
+/// Easily adjustable variables
+const BUFFER_PERCENT = 20; // Buffer percentage (10 means 10%)
+const GREEN_COLOR = 'rgba(75, 192, 192, 0.2)'; // Light green
+const RED_COLOR = 'rgba(255, 99, 132, 0.2)'; // Light red
+const LINE_COLOR = 'rgba(75, 192, 192, 1)'; // Solid green for the line
+
+
+//location of Other scripts
+const accountHtml = './Account/account_setup.html';
+
+
+
 
 document.getElementById("newAccountBtn").addEventListener("click", function () {
     window.location.href = accountHtml;
@@ -29,22 +38,26 @@ window.addEventListener('load', function () {
     if (accountData) {
         account = JSON.parse(accountData);
         trades = JSON.parse(localStorage.getItem('tradingTrades') || '[]');
-        cumulativeBalances = [account.startingBalance]; // Initialize with starting balance
-
-        let runningBalance = account.startingBalance;
-        trades.forEach(trade => {
-            runningBalance += trade.netProfitLoss;
-            cumulativeBalances.push(runningBalance);
-
-        });
-
+        calculateCumulativeBalances();
         updateAccountDisplay();
         updateTradeTable();
-        updateChart(); // Initial chart update
+        updateChart();
         showMainContent();
-        displayTrades(); // Display
+        displayTrades();
     }
 });
+
+// Calculate cumulative balances
+function calculateCumulativeBalances() {
+    cumulativeBalances = [account.startingBalance];
+    let runningBalance = account.startingBalance;
+    trades.forEach(trade => {
+        runningBalance += trade.netProfitLoss;
+        cumulativeBalances.push(runningBalance);
+    });
+    account.currentBalance = runningBalance;
+}
+
 
 // Update account balance
 function updateAccountBalance(trade) {
@@ -52,11 +65,16 @@ function updateAccountBalance(trade) {
         account.currentBalance += trade.netProfitLoss;
         cumulativeBalances.push(account.currentBalance);
         updateAccountDisplay();
-        updateChart(); // Update chart after balance change
+        updateChart();
         // Save updated data to localStorage
-        localStorage.setItem('tradingAccount', JSON.stringify(account));
-        localStorage.setItem('tradingTrades', JSON.stringify(trades));
+        saveDataToLocalStorage();
     }
+}
+
+// Save data to localStorage
+function saveDataToLocalStorage() {
+    localStorage.setItem('tradingAccount', JSON.stringify(account));
+    localStorage.setItem('tradingTrades', JSON.stringify(trades));
 }
 
 // Record trade
@@ -83,7 +101,7 @@ document.getElementById("tradeForm").addEventListener("submit", function (e) {
     this.reset(); // Reset the form
 });
 
-//to display
+// Display trades
 function displayTrades() {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
@@ -103,7 +121,7 @@ function displayTrades() {
                 <td class="table-cell-right">${trade.profitLoss.toFixed(2)}</td>
                 <td class="table-cell">${trade.strategy}</td>
                 <td class="table-cell-right">${trade.commission.toFixed(2)}</td>
-                <td class="table-cell-right">${(trade.profitLoss - trade.commission).toFixed(2)}</td>
+                <td class="table-cell-right">${trade.netProfitLoss.toFixed(2)}</td>
             </tr>
         `;
         tableBody.innerHTML += row;
@@ -166,13 +184,9 @@ function updateTradeTable() {
         row.insertCell(8).textContent = trade.commission.toFixed(2);
         row.insertCell(9).textContent = trade.netProfitLoss.toFixed(2);
     });
+    displayTrades(); // Update pagination
 }
 
-/// Easily adjustable variables
-const BUFFER_PERCENT = 10; // Buffer percentage (10 means 10%)
-const GREEN_COLOR = 'rgba(75, 192, 192, 0.2)'; // Light green
-const RED_COLOR = 'rgba(255, 99, 132, 0.2)'; // Light red
-const LINE_COLOR = 'rgba(75, 192, 192, 1)'; // Solid green for the line
 
 // Custom Plugin
 const customBackgroundPlugin = {
@@ -340,6 +354,7 @@ document.getElementById("saveButton").addEventListener("click", function () {
     a.click();
 });
 
+
 // Load data from JSON
 document.getElementById("loadFile").addEventListener("change", function (e) {
     const file = e.target.files[0];
@@ -349,19 +364,11 @@ document.getElementById("loadFile").addEventListener("change", function (e) {
             const data = JSON.parse(e.target.result);
             account = data.account;
             trades = data.trades;
-            cumulativeBalances = [account.startingBalance]; // Reset cumulative balances
-            trades.forEach(trade => {
-                // Calculate net profit/loss and update cumulative balances
-                trade.netProfitLoss = trade.profitLoss - trade.commission;
-                account.currentBalance += trade.netProfitLoss;
-                cumulativeBalances.push(account.currentBalance);
-            });
+            calculateCumulativeBalances();
             updateAccountDisplay();
             updateTradeTable();
-            updateChart(); // Update chart after loading new data
-            // Update localStorage
-            localStorage.setItem('tradingAccount', JSON.stringify(account));
-            localStorage.setItem('tradingTrades', JSON.stringify(trades));
+            updateChart();
+            saveDataToLocalStorage();
             showMainContent();
         };
         reader.readAsText(file);
@@ -372,31 +379,28 @@ document.getElementById("loadFile").addEventListener("change", function (e) {
 document.getElementById("clearDataBtn").addEventListener("click", function () {
     const confirmClear = confirm("Are you sure you want to clear all data?");
     if (confirmClear) {
-        localStorage.clear(); // Clear local storage
-        account = null; // Reset account variable
-        trades = []; // Reset trades array
-        cumulativeBalances = []; // Reset cumulative balances
-
-        // Update display and table
-        updateAccountDisplay(); // Update display to reflect cleared data
-        updateTradeTable(); // Clear trade table
-
-        // Alert and refresh
+        localStorage.clear();
+        account = null;
+        trades = [];
+        cumulativeBalances = [];
+        updateAccountDisplay();
+        updateTradeTable();
+        updateChart();
         alert("All data has been cleared.");
-        location.reload(); // Refresh the page
+        location.reload();
     }
 });
 
+
+// Modal functionality
 const openModalButton = document.getElementById("openModalBtn");
 const modal = document.getElementById("modal");
 const closeModalButton = document.querySelector(".close-button");
 
-// Open the modal when the button is clicked
 openModalButton.onclick = function () {
     modal.classList.remove("hidden");
 }
 
-// Close the modal when the close button is clicked
 closeModalButton.onclick = function () {
     modal.classList.add("hidden");
 }
