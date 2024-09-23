@@ -30,6 +30,14 @@ window.addEventListener('load', function () {
         account = JSON.parse(accountData);
         trades = JSON.parse(localStorage.getItem('tradingTrades') || '[]');
         cumulativeBalances = [account.startingBalance]; // Initialize with starting balance
+
+        let runningBalance = account.startingBalance;
+        trades.forEach(trade => {
+            runningBalance += trade.netProfitLoss;
+            cumulativeBalances.push(runningBalance);
+
+        });
+
         updateAccountDisplay();
         updateTradeTable();
         updateChart(); // Initial chart update
@@ -160,28 +168,109 @@ function updateTradeTable() {
     });
 }
 
-// Update chart
+/// Easily adjustable variables
+const BUFFER_PERCENT = 10; // Buffer percentage (10 means 10%)
+const GREEN_COLOR = 'rgba(75, 192, 192, 0.2)'; // Light green
+const RED_COLOR = 'rgba(255, 99, 132, 0.2)'; // Light red
+const LINE_COLOR = 'rgba(75, 192, 192, 1)'; // Solid green for the line
+
+// Custom Plugin
+const customBackgroundPlugin = {
+    id: 'customBackground',
+    beforeDatasetsDraw(chart) {
+        if (account) {
+            const startingBalance = account.startingBalance; // Access the startingBalance from the account
+            const { ctx, chartArea: { top, bottom }, scales: { x, y } } = chart;
+            const startX = x.getPixelForValue(0);
+            const startY = y.getPixelForValue(startingBalance);
+
+            cumulativeBalances.forEach((balance, index) => {
+                if (index === 0) return; // Skip the first point (Start)
+
+                const prevBalance = cumulativeBalances[index - 1];
+                const currX = x.getPixelForValue(index);
+                const prevX = x.getPixelForValue(index - 1);
+                const currY = y.getPixelForValue(balance);
+                const prevY = y.getPixelForValue(prevBalance);
+
+                ctx.save();
+                ctx.beginPath();
+
+                // Move to the previous point
+                ctx.moveTo(prevX, prevY);
+
+                // Line to the current point
+                ctx.lineTo(currX, currY);
+
+                // Check if the line segment crosses the starting balance
+                if ((prevBalance < startingBalance && balance > startingBalance) ||
+                    (prevBalance > startingBalance && balance < startingBalance)) {
+
+                    // Calculate the intersection point with the starting balance
+                    const intersectionX = prevX + (currX - prevX) * ((startingBalance - prevBalance) / (balance - prevBalance));
+                    const intersectionY = startY;
+
+                    // Draw down to the starting balance (intersection point)
+                    ctx.lineTo(intersectionX, intersectionY);
+
+                    // Close the path and fill the area below the starting balance (red)
+                    ctx.lineTo(prevX, startY);
+                    ctx.closePath();
+                    ctx.fillStyle = prevBalance > startingBalance ? GREEN_COLOR : RED_COLOR;
+                    ctx.fill();
+
+                    // Start a new path for the area above the starting balance (green)
+                    ctx.beginPath();
+                    ctx.moveTo(intersectionX, intersectionY);
+                    ctx.lineTo(currX, currY);
+                    ctx.lineTo(currX, startY);
+                    ctx.lineTo(intersectionX, startY);
+                    ctx.closePath();
+                    ctx.fillStyle = balance > startingBalance ? GREEN_COLOR : RED_COLOR;
+                    ctx.fill();
+                } else {
+                    // No crossing, just fill the entire segment
+                    ctx.lineTo(currX, startY);
+                    ctx.lineTo(prevX, startY);
+                    ctx.closePath();
+                    ctx.fillStyle = balance > startingBalance ? GREEN_COLOR : RED_COLOR;
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            });
+        } else {
+            console.error('Account or starting balance not defined');
+        }
+    }
+};
+
 function updateChart() {
     const ctx = document.getElementById('balanceChart').getContext('2d');
     if (window.balanceChart && typeof window.balanceChart.destroy === "function") {
         window.balanceChart.destroy();
     }
 
-    // Create labels for each trade (including the starting point)
-    const labels = ['Start', ...trades.map((_, index) => `Trade ${index + 1}`)];
+    const labels = ['Start', ...Array.from({ length: trades.length }, (_, i) => i + 1)];
+    const startingBalance = account.startingBalance;
+
+    // Calculate min and max values for dynamic scaling
+    const minBalance = Math.min(...cumulativeBalances);
+    const maxBalance = Math.max(...cumulativeBalances);
+    const dataRange = maxBalance - minBalance;
+    const buffer = dataRange * (BUFFER_PERCENT / 100);
 
     window.balanceChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Cumulative Balance',
+                label: 'Balance',
                 data: cumulativeBalances,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: LINE_COLOR,
                 borderWidth: 2,
-                fill: true,
-                tension: 0.1 // Slight curve to the line
+                fill: false,
+                tension: 0.1
             }]
         },
         options: {
@@ -195,11 +284,13 @@ function updateChart() {
                     }
                 },
                 y: {
-                    beginAtZero: false, // Allow the chart to start from the initial balance
+                    beginAtZero: false,
                     title: {
                         display: true,
                         text: 'Balance'
-                    }
+                    },
+                    min: minBalance - buffer,
+                    max: maxBalance + buffer
                 }
             },
             plugins: {
@@ -213,11 +304,28 @@ function updateChart() {
                     }
                 },
                 legend: {
-                    display: true,
-                    position: 'top'
+                    display: false
+                },
+                annotation: {
+                    annotations: {
+                        line1: {
+                            type: 'line',
+                            yMin: startingBalance,
+                            yMax: startingBalance,
+                            borderColor: 'rgba(0, 0, 0, 0.5)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            label: {
+                                content: 'Starting Balance',
+                                enabled: true,
+                                position: 'left'
+                            }
+                        }
+                    }
                 }
             }
-        }
+        },
+        plugins: [customBackgroundPlugin]
     });
 }
 
