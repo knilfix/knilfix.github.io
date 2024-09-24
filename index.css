@@ -182,6 +182,7 @@ button:hover {
     background-color: #218838;
 }
 
+/* Table Styles */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -191,42 +192,90 @@ table {
 th,
 td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 12px;
+    /* Increased padding for better spacing */
     text-align: left;
+    transition: background-color 0.3s;
+    /* Smooth hover effect */
 }
 
 th {
     background-color: #007bff;
+    /* Primary color */
     color: white;
+    font-weight: bold;
+    /* Ensure header text stands out */
 }
 
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+    /* Light gray for even rows */
+}
 
+tr:hover {
+    background-color: #e0e0e0;
+    /* Slightly darker gray on hover */
+}
 
+/* Trade History Section */
 #tradeHistory {
     margin-top: 20px;
     background-color: #fff;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    /* Deeper shadow for better separation */
     padding: 20px;
 }
 
+/* Form Styles */
 #tradeForm label {
     display: inline-block;
     width: 120px;
+    /* Fixed width for labels */
 }
 
 #tradeForm input,
 #tradeForm select {
     width: calc(100% - 130px);
+    /* Adjust width for inputs */
     margin-bottom: 10px;
-    padding: 8px;
+    padding: 10px;
+    /* Increased padding for better user experience */
     border: 1px solid #ccc;
     border-radius: 4px;
+    transition: border-color 0.3s;
+    /* Smooth transition for input focus */
 }
 
+#tradeForm input:focus,
+#tradeForm select:focus {
+    border-color: #007bff;
+    /* Change border color on focus */
+    outline: none;
+    /* Remove default outline */
+}
+
+/* Button Styles */
 #tradeForm button {
-    width: auto;
-    margin-top: 10px;
+    background-color: #007bff;
+    /* Primary button color */
+    color: white;
+    /* Text color */
+    padding: 10px 15px;
+    /* Add padding for better clickability */
+    border: none;
+    /* Remove default border */
+    border-radius: 4px;
+    /* Rounded corners */
+    cursor: pointer;
+    /* Pointer cursor on hover */
+    transition: background-color 0.3s;
+    /* Smooth hover effect */
+}
+
+#tradeForm button:hover {
+    background-color: #0056b3;
+    /* Darker shade on hover */
 }
 
 .hidden {
