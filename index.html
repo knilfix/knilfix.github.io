@@ -128,6 +128,7 @@
                     <table id="tradeTable" class="min-w-full bg-white border border-gray-300 rounded-lg">
                         <thead class="bg-gray-200 text-gray-600">
                             <tr>
+                                <!-- Other columns -->
                                 <th class="px-4 py-2 text-left">Entry Date</th>
                                 <th class="px-4 py-2 text-left">Exit Date</th>
                                 <th class="px-4 py-2 text-left">Type</th>
@@ -138,6 +139,7 @@
                                 <th class="px-4 py-2 text-left">Strategy</th>
                                 <th class="px-4 py-2 text-right">Commission</th>
                                 <th class="px-4 py-2 text-right">Net Profit/Loss</th>
+
                             </tr>
                         </thead>
                         <tbody id="tradeTableBody" class="text-gray-700">
@@ -176,9 +178,9 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.4.0/chartjs-plugin-annotation.min.js"></script>
-        <script src="CRUD.js"></script>
+        <script type="module" src="trade-history.js"></script>
 
-        <script src="index.js"></script>
+        <script type="module" src="index.js"></script>
 </body>
 
 </html>

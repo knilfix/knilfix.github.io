@@ -1,23 +1,16 @@
+import { trades, displayTrades, updateTradeTable, prevPage, nextPage, getTotalPages } from './trade-history.js';
+
 let account = null;
-let trades = [];
 let cumulativeBalances = [];
 
-// Global variables
-let currentPage = 1;
-const rowsPerPage = 10;
-
 /// Easily adjustable variables
-const BUFFER_PERCENT = 20; // Buffer percentage (10 means 10%)
+const BUFFER_PERCENT = 20; // Buffer percentage (20 means 20%)
 const GREEN_COLOR = 'rgba(75, 192, 192, 0.2)'; // Light green
 const RED_COLOR = 'rgba(255, 99, 132, 0.2)'; // Light red
 const LINE_COLOR = 'rgba(75, 192, 192, 1)'; // Solid green for the line
 
-
 //location of Other scripts
 const accountHtml = './Account/account_setup.html';
-
-
-
 
 document.getElementById("newAccountBtn").addEventListener("click", function () {
     window.location.href = accountHtml;
@@ -37,13 +30,12 @@ window.addEventListener('load', function () {
     const accountData = localStorage.getItem('tradingAccount');
     if (accountData) {
         account = JSON.parse(accountData);
-        trades = JSON.parse(localStorage.getItem('tradingTrades') || '[]');
+        trades.push(...JSON.parse(localStorage.getItem('tradingTrades') || '[]'));
         calculateCumulativeBalances();
         updateAccountDisplay();
         updateTradeTable();
         updateChart();
         showMainContent();
-        displayTrades();
     }
 });
 
@@ -57,7 +49,6 @@ function calculateCumulativeBalances() {
     });
     account.currentBalance = runningBalance;
 }
-
 
 // Update account balance
 function updateAccountBalance(trade) {
@@ -101,58 +92,6 @@ document.getElementById("tradeForm").addEventListener("submit", function (e) {
     this.reset(); // Reset the form
 });
 
-// Display trades
-function displayTrades() {
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    const tableBody = document.getElementById('tradeTableBody');
-    tableBody.innerHTML = '';
-
-    for (let i = startIndex; i < endIndex && i < trades.length; i++) {
-        const trade = trades[i];
-        const row = `
-            <tr class="table-row-alternate">
-                <td class="table-cell">${trade.entryDate}</td>
-                <td class="table-cell">${trade.exitDate}</td>
-                <td class="table-cell">${trade.type}</td>
-                <td class="table-cell-right">${trade.entryPrice.toFixed(2)}</td>
-                <td class="table-cell-right">${trade.exitPrice.toFixed(2)}</td>
-                <td class="table-cell-right">${trade.positionSize.toFixed(2)}</td>
-                <td class="table-cell-right">${trade.profitLoss.toFixed(2)}</td>
-                <td class="table-cell">${trade.strategy}</td>
-                <td class="table-cell-right">${trade.commission.toFixed(2)}</td>
-                <td class="table-cell-right">${trade.netProfitLoss.toFixed(2)}</td>
-            </tr>
-        `;
-        tableBody.innerHTML += row;
-    }
-
-    updatePaginationInfo();
-}
-
-function updatePaginationInfo() {
-    const totalPages = Math.ceil(trades.length / rowsPerPage);
-    document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
-    document.getElementById('prevPage').disabled = currentPage === 1;
-    document.getElementById('nextPage').disabled = currentPage === totalPages;
-}
-
-document.getElementById('prevPage').addEventListener('click', () => {
-    if (currentPage > 1) {
-        currentPage--;
-        displayTrades();
-    }
-});
-
-document.getElementById('nextPage').addEventListener('click', () => {
-    const totalPages = Math.ceil(trades.length / rowsPerPage);
-    if (currentPage < totalPages) {
-        currentPage++;
-        displayTrades();
-    }
-});
-
-
 // Update account balance display
 function updateAccountDisplay() {
     if (account) {
@@ -167,33 +106,12 @@ function updateAccountDisplay() {
     }
 }
 
-// Update trade table
-function updateTradeTable() {
-    const tbody = document.getElementById("tradeTableBody");
-    tbody.innerHTML = "";
-    trades.forEach(trade => {
-        const row = tbody.insertRow();
-        row.insertCell(0).textContent = trade.entryDate;
-        row.insertCell(1).textContent = trade.exitDate;
-        row.insertCell(2).textContent = trade.type;
-        row.insertCell(3).textContent = trade.entryPrice.toFixed(5);
-        row.insertCell(4).textContent = trade.exitPrice.toFixed(5);
-        row.insertCell(5).textContent = trade.positionSize.toFixed(2);
-        row.insertCell(6).textContent = trade.profitLoss.toFixed(2);
-        row.insertCell(7).textContent = trade.strategy;
-        row.insertCell(8).textContent = trade.commission.toFixed(2);
-        row.insertCell(9).textContent = trade.netProfitLoss.toFixed(2);
-    });
-    displayTrades(); // Update pagination
-}
-
-
-// Custom Plugin
+// Custom Plugin for Chart.js
 const customBackgroundPlugin = {
     id: 'customBackground',
     beforeDatasetsDraw(chart) {
         if (account) {
-            const startingBalance = account.startingBalance; // Access the startingBalance from the account
+            const startingBalance = account.startingBalance;
             const { ctx, chartArea: { top, bottom }, scales: { x, y } } = chart;
             const startX = x.getPixelForValue(0);
             const startY = y.getPixelForValue(startingBalance);
@@ -227,13 +145,13 @@ const customBackgroundPlugin = {
                     // Draw down to the starting balance (intersection point)
                     ctx.lineTo(intersectionX, intersectionY);
 
-                    // Close the path and fill the area below the starting balance (red)
+                    // Close the path and fill the area below the starting balance
                     ctx.lineTo(prevX, startY);
                     ctx.closePath();
                     ctx.fillStyle = prevBalance > startingBalance ? GREEN_COLOR : RED_COLOR;
                     ctx.fill();
 
-                    // Start a new path for the area above the starting balance (green)
+                    // Start a new path for the area above the starting balance
                     ctx.beginPath();
                     ctx.moveTo(intersectionX, intersectionY);
                     ctx.lineTo(currX, currY);
@@ -354,7 +272,6 @@ document.getElementById("saveButton").addEventListener("click", function () {
     a.click();
 });
 
-
 // Load data from JSON
 document.getElementById("loadFile").addEventListener("change", function (e) {
     const file = e.target.files[0];
@@ -363,7 +280,8 @@ document.getElementById("loadFile").addEventListener("change", function (e) {
         reader.onload = function (e) {
             const data = JSON.parse(e.target.result);
             account = data.account;
-            trades = data.trades;
+            trades.length = 0; // Clear existing trades
+            trades.push(...data.trades); // Add loaded trades
             calculateCumulativeBalances();
             updateAccountDisplay();
             updateTradeTable();
@@ -381,7 +299,7 @@ document.getElementById("clearDataBtn").addEventListener("click", function () {
     if (confirmClear) {
         localStorage.clear();
         account = null;
-        trades = [];
+        trades.length = 0; // Clear trades array
         cumulativeBalances = [];
         updateAccountDisplay();
         updateTradeTable();
@@ -390,7 +308,6 @@ document.getElementById("clearDataBtn").addEventListener("click", function () {
         location.reload();
     }
 });
-
 
 // Modal functionality
 const openModalButton = document.getElementById("openModalBtn");
@@ -404,3 +321,7 @@ openModalButton.onclick = function () {
 closeModalButton.onclick = function () {
     modal.classList.add("hidden");
 }
+
+// Event listeners for pagination
+document.getElementById('prevPage').addEventListener('click', prevPage);
+document.getElementById('nextPage').addEventListener('click', nextPage);
